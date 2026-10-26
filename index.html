@@ -13,13 +13,11 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         
-        /* CSS Khusus Mode Cetak / Export PDF */
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             body { background: white !important; color: black !important; }
             
-            /* Penyesuaian Bingkai Kartu Ringkasan Cetak */
             .summary-card { 
                 border: 1px solid #94a3b8 !important; 
                 background-color: #ffffff !important; 
@@ -86,13 +84,11 @@
                 <p class="text-xs text-slate-500">Sistem Pembukuan Kas Terintegrasi Google Sheets</p>
             </div>
 
-            <!-- TAB LOGIN / SIGNUP -->
             <div class="flex bg-slate-100 p-1 rounded-xl mb-6 text-sm font-medium">
                 <button id="tabLoginBtn" onclick="toggleAuthTab('login')" class="flex-1 py-2 rounded-lg bg-white text-indigo-900 shadow-sm font-bold">Login Pengguna</button>
                 <button id="tabSignupBtn" onclick="toggleAuthTab('signup')" class="flex-1 py-2 rounded-lg text-slate-600">Daftar Pengguna Baru</button>
             </div>
 
-            <!-- FORM LOGIN -->
             <div id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pengguna</label>
@@ -104,7 +100,6 @@
                 </button>
             </div>
 
-            <!-- FORM SIGNUP -->
             <div id="signupForm" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pengguna Baru</label>
@@ -128,7 +123,6 @@
 
     <!-- PANEL DASHBOARD UTAMA -->
     <div id="dashboardSection" class="hidden">
-        <!-- Header / Navbar Utama -->
         <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50 no-print">
             <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
@@ -143,7 +137,6 @@
                     </div>
                 </div>
 
-                <!-- Tab Menu & Logout -->
                 <div class="flex items-center gap-3">
                     <div class="flex bg-indigo-800/80 p-1 rounded-xl text-sm font-medium">
                         <button id="tabKasBtn" onclick="switchTab('kas')" class="px-4 py-2 rounded-lg bg-white text-indigo-900 shadow-sm transition-all flex items-center space-x-2">
@@ -203,14 +196,19 @@
 
                 <!-- Quick Action Bar -->
                 <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 no-print">
-                    <div class="flex items-center space-x-2 w-full md:w-auto">
-                        <button onclick="openModalTransaksi('masuk')" class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <button onclick="openModalTransaksi('masuk')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
                             <i class="fa-solid fa-circle-plus"></i>
-                            <span>+ Catat Pemasukan Umum</span>
+                            <span>+ Catat Pemasukan</span>
                         </button>
-                        <button onclick="openModalTransaksi('keluar')" class="flex-1 md:flex-none px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
+                        <button onclick="openModalTransaksi('keluar')" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
                             <i class="fa-solid fa-circle-minus"></i>
-                            <span>- Catat Belanja/Pengeluaran</span>
+                            <span>- Catat Belanja</span>
+                        </button>
+                        <!-- FITUR 6: SET SALDO AWAL -->
+                        <button onclick="openModalSaldoAwal('kas')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
+                            <i class="fa-solid fa-coins"></i>
+                            <span>+ Set Saldo Awal</span>
                         </button>
                     </div>
 
@@ -222,6 +220,27 @@
                         <button onclick="exportToExcel('umum')" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium rounded-xl transition flex items-center space-x-2 shadow-sm">
                             <i class="fa-solid fa-file-excel text-emerald-300"></i>
                             <span>Ekspor Excel</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FITUR 1: FILTER TANGGAL & PERIODE (Kas Umum) -->
+                <div class="bg-slate-200/60 p-3.5 rounded-2xl border border-slate-300/80 flex flex-wrap items-center justify-between gap-3 no-print">
+                    <div class="flex items-center space-x-2 text-xs font-semibold text-slate-700">
+                        <i class="fa-solid fa-filter text-indigo-600"></i>
+                        <span>Filter Periode Kas:</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <div class="flex items-center space-x-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-300">
+                            <span class="text-slate-500">Dari:</span>
+                            <input type="date" id="filterKasMulai" onchange="renderTableKasUmum()" class="focus:outline-none text-slate-700 bg-transparent font-medium">
+                        </div>
+                        <div class="flex items-center space-x-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-300">
+                            <span class="text-slate-500">Sampai:</span>
+                            <input type="date" id="filterKasSelesai" onchange="renderTableKasUmum()" class="focus:outline-none text-slate-700 bg-transparent font-medium">
+                        </div>
+                        <button onclick="resetFilterKas()" class="px-3 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-700 font-semibold rounded-xl transition">
+                            Reset Filter
                         </button>
                     </div>
                 </div>
@@ -323,7 +342,7 @@
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Untuk Setoran Bulan</label>
-                            <select id="setorBulanSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-indigo-700">
+                            <select id="setorBulanSelect" onchange="renderTunggakanAnggota()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-indigo-700">
                                 <option value="Januari">Januari</option>
                                 <option value="Februari">Februari</option>
                                 <option value="Maret">Maret</option>
@@ -355,16 +374,36 @@
                             <span>Simpan Setoran Kas</span>
                         </button>
 
-                        <div class="pt-2 border-t border-slate-100">
-                            <button onclick="openModalPengeluaranAnggota()" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-xl border border-rose-200 transition flex items-center justify-center space-x-1.5">
+                        <div class="pt-2 flex flex-col gap-2 border-t border-slate-100">
+                            <button onclick="openModalPengeluaranAnggota()" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-xl border border-rose-200 transition flex items-center justify-center space-x-1.5">
                                 <i class="fa-solid fa-circle-minus"></i>
                                 <span>Catat Pengeluaran Kas Anggota</span>
+                            </button>
+                            <!-- FITUR 6: SET SALDO AWAL ANGGOTA -->
+                            <button onclick="openModalSaldoAwal('anggota')" class="w-full py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold text-xs rounded-xl border border-amber-200 transition flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-coins"></i>
+                                <span>Set Saldo Awal Kas Anggota</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Matriks Rekap Anggota -->
+                    <!-- Matriks Rekap Anggota & Panel Tunggakan -->
                     <div class="lg:col-span-2 space-y-4">
+                        <!-- FITUR 2: PANEL DAFTAR TUNGGAKAN ANGGOTA -->
+                        <div class="bg-amber-50/80 rounded-2xl p-4 border border-amber-200 shadow-sm space-y-3 no-print">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-amber-900 text-sm flex items-center space-x-2">
+                                    <i class="fa-solid fa-circle-exclamation text-amber-600"></i>
+                                    <span>Belum Bayar Kas Bulan <span id="tunggakanBulanTitle" class="underline">Oktober</span>:</span>
+                                </h4>
+                                <span id="tunggakanJumlahBadge" class="text-[11px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">0 Anggota</span>
+                            </div>
+
+                            <div id="tunggakanAnggotaList" class="flex flex-wrap gap-2 text-xs">
+                                <!-- Dynamic List -->
+                            </div>
+                        </div>
+
                         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
                                 <div>
@@ -390,7 +429,7 @@
 
                 <!-- TABEL REKAP JURNAL KAS ANGGOTA -->
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-                    <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+                    <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <h3 class="font-bold text-slate-800 flex items-center space-x-2">
                             <i class="fa-solid fa-list-check text-indigo-600"></i>
                             <span>Jurnal Pemasukan & Pengeluaran Kas Anggota</span>
@@ -437,6 +476,43 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- MODAL POPUP: FITUR 6 - SET SALDO AWAL -->
+    <div id="modalSaldoAwal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 id="modalSaldoTitle" class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+                    <i class="fa-solid fa-coins text-amber-500"></i>
+                    <span>Set Saldo Awal Periode</span>
+                </h3>
+                <button onclick="closeModalSaldoAwal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <input type="hidden" id="saldoAwalTipe" value="kas">
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Saldo Awal</label>
+                <input type="date" id="saldoAwalTanggal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Uraian / Catatan</label>
+                <input type="text" id="saldoAwalUraian" value="Saldo Awal Periode Kas" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nominal Saldo Awal (Rp)</label>
+                <input type="number" id="saldoAwalNominal" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
+            </div>
+
+            <div class="pt-2 flex space-x-2">
+                <button onclick="closeModalSaldoAwal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition">Batal</button>
+                <button onclick="simpanSaldoAwal()" class="w-1/2 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm rounded-xl transition shadow-sm">Simpan Saldo Awal</button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL POPUP: Catat Pengeluaran Kas Anggota -->
@@ -524,7 +600,7 @@
 
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Uraian / Keterangan Transaksi</label>
-                <input type="text" id="modalTxUraian" placeholder="Contoh: Pembelian kue basah / Saldo Awal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="modalTxUraian" placeholder="Contoh: Pembelian kue basah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
 
             <div>
@@ -596,6 +672,7 @@
             if(document.getElementById('setorTanggalInput')) document.getElementById('setorTanggalInput').value = today;
             if(document.getElementById('modalTxTanggal')) document.getElementById('modalTxTanggal').value = today;
             if(document.getElementById('keluarAnggotaTanggal')) document.getElementById('keluarAnggotaTanggal').value = today;
+            if(document.getElementById('saldoAwalTanggal')) document.getElementById('saldoAwalTanggal').value = today;
             
             var options = { year: 'numeric', month: 'long', day: 'numeric' };
             if(document.getElementById('printDate')) document.getElementById('printDate').innerText = new Date().toLocaleDateString('id-ID', options);
@@ -776,23 +853,34 @@
             renderTableSetoranAnggota();
             renderAnggotaSelect();
             renderAnggotaGrid();
+            renderTunggakanAnggota();
         }
 
+        /* FITUR 1: FILTER TANGGAL & PERIODE KAS UMUM */
         function renderTableKasUmum() {
             var tbody = document.getElementById('tabelKasUmumBody');
             if(!tbody) return;
             tbody.innerHTML = '';
 
+            var tglMulai = document.getElementById('filterKasMulai').value;
+            var tglSelesai = document.getElementById('filterKasSelesai').value;
+
+            var filteredList = window.kasUmumList.filter(tx => {
+                if (tglMulai && tx.tanggal < tglMulai) return false;
+                if (tglSelesai && tx.tanggal > tglSelesai) return false;
+                return true;
+            });
+
             var runningSaldo = 0;
             var totalMasuk = 0;
             var totalKeluar = 0;
 
-            window.kasUmumList.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+            filteredList.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
-            if (window.kasUmumList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada transaksi kas umum. Klik "+ Catat Pemasukan Umum" untuk mulai.</td></tr>`;
+            if (filteredList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada transaksi kas umum pada periode ini.</td></tr>`;
             } else {
-                window.kasUmumList.forEach((tx, idx) => {
+                filteredList.forEach((tx, idx) => {
                     runningSaldo += (tx.masuk - tx.keluar);
                     totalMasuk += tx.masuk;
                     totalKeluar += tx.keluar;
@@ -828,7 +916,13 @@
             document.getElementById('footPengeluaranKasUmum').innerText = formatRupiah(totalKeluar);
             document.getElementById('footSaldoKasUmum').innerText = formatRupiah(runningSaldo);
 
-            document.getElementById('totalBarisKasUmum').innerText = window.kasUmumList.length + " Transaksi";
+            document.getElementById('totalBarisKasUmum').innerText = filteredList.length + " Transaksi";
+        }
+
+        function resetFilterKas() {
+            document.getElementById('filterKasMulai').value = '';
+            document.getElementById('filterKasSelesai').value = '';
+            renderTableKasUmum();
         }
 
         function renderTableSetoranAnggota() {
@@ -882,6 +976,101 @@
             document.getElementById('footPemasukanKasAnggota').innerText = formatRupiah(totalMasuk);
             document.getElementById('footPengeluaranKasAnggota').innerText = formatRupiah(totalKeluar);
             document.getElementById('footSaldoKasAnggota').innerText = formatRupiah(runningSaldo);
+        }
+
+        /* FITUR 2: DAFTAR TUNGGAKAN ANGGOTA */
+        function renderTunggakanAnggota() {
+            var bulanSelected = document.getElementById('setorBulanSelect').value;
+            document.getElementById('tunggakanBulanTitle').innerText = bulanSelected;
+
+            var container = document.getElementById('tunggakanAnggotaList');
+            if(!container) return;
+            container.innerHTML = '';
+
+            if (bulanSelected === "Lainnya") {
+                container.innerHTML = `<span class="text-slate-500 italic">Pilih bulan spesifik di atas untuk melihat tunggakan.</span>`;
+                document.getElementById('tunggakanJumlahBadge').innerText = "0 Anggota";
+                return;
+            }
+
+            var belumBayar = window.anggotaList.filter(nama => {
+                var pernahBayar = window.setoranAnggotaList.some(s => s.nama && s.nama.toLowerCase() === nama.toLowerCase() && s.bulan === bulanSelected && s.masuk > 0);
+                return !pernahBayar;
+            });
+
+            document.getElementById('tunggakanJumlahBadge').innerText = belumBayar.length + " Anggota";
+
+            if (belumBayar.length === 0) {
+                container.innerHTML = `<span class="text-emerald-700 font-medium flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Semua anggota sudah lunas membayar Kas Bulan ${bulanSelected}!</span>`;
+            } else {
+                belumBayar.forEach(nama => {
+                    var badge = document.createElement('div');
+                    badge.className = "bg-white border border-amber-300 px-3 py-1 rounded-xl shadow-xs flex items-center space-x-2";
+                    badge.innerHTML = `
+                        <span class="font-semibold text-slate-800">${nama}</span>
+                        <button onclick="pilihPenyetorTunggakan('${nama}')" class="text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-0.5 rounded-lg transition" title="Setor untuk ${nama}">
+                            + Setor
+                        </button>
+                    `;
+                    container.appendChild(badge);
+                });
+            }
+        }
+
+        function pilihPenyetorTunggakan(nama) {
+            document.getElementById('setorAnggotaSelect').value = nama;
+            document.getElementById('setorNominalInput').focus();
+        }
+
+        /* FITUR 6: SET SALDO AWAL */
+        function openModalSaldoAwal(tipe) {
+            document.getElementById('saldoAwalTipe').value = tipe;
+            var title = tipe === 'kas' ? 'Set Saldo Awal Kas Umum' : 'Set Saldo Awal Kas Anggota';
+            document.getElementById('modalSaldoTitle').innerText = title;
+            document.getElementById('saldoAwalUraian').value = tipe === 'kas' ? 'Saldo Awal Periode Kas Umum' : 'Saldo Awal Periode Kas Anggota';
+            document.getElementById('saldoAwalNominal').value = '';
+            document.getElementById('modalSaldoAwal').classList.remove('hidden');
+        }
+
+        function closeModalSaldoAwal() {
+            document.getElementById('modalSaldoAwal').classList.add('hidden');
+        }
+
+        function simpanSaldoAwal() {
+            var tipe = document.getElementById('saldoAwalTipe').value;
+            var tanggal = document.getElementById('saldoAwalTanggal').value;
+            var uraian = document.getElementById('saldoAwalUraian').value.trim();
+            var nominal = parseFloat(document.getElementById('saldoAwalNominal').value);
+
+            if (!tanggal || !uraian || isNaN(nominal) || nominal <= 0) {
+                alert("Masukkan tanggal, uraian, dan nominal saldo awal yang valid!");
+                return;
+            }
+
+            if (tipe === 'kas') {
+                window.kasUmumList.push({
+                    id: Date.now(),
+                    tanggal: tanggal,
+                    uraian: "[SALDO AWAL] " + uraian,
+                    masuk: nominal,
+                    keluar: 0
+                });
+            } else {
+                window.setoranAnggotaList.push({
+                    id: Date.now(),
+                    tanggal: tanggal,
+                    nama: "Saldo Awal",
+                    bulan: "Lainnya",
+                    uraian: "[SALDO AWAL] " + uraian,
+                    masuk: nominal,
+                    keluar: 0
+                });
+            }
+
+            renderAll();
+            saveDataToCloud();
+            closeModalSaldoAwal();
+            alert(`Saldo awal sebesar ${formatRupiah(nominal)} berhasil dicatat!`);
         }
 
         function renderAnggotaSelect() {
