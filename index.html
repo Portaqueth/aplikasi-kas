@@ -12,12 +12,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        
+        /* CSS Khusus Mode Cetak / Export PDF */
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             body { background: white !important; color: black !important; }
-            .shadow-md, .shadow-sm, .shadow-lg { box-shadow: none !important; }
-            .border { border-color: #cbd5e1 !important; }
+            
+            /* Penyesuaian Bingkai Kartu Ringkasan Cetak */
+            .summary-card { 
+                border: 1px solid #94a3b8 !important; 
+                background-color: #ffffff !important; 
+                box-shadow: none !important;
+                color: #1e293b !important;
+            }
+            .summary-card p { color: #334155 !important; }
+            .summary-card .icon-box { 
+                border: 1px solid #cbd5e1 !important; 
+                background-color: #f8fafc !important; 
+            }
+            
             table { width: 100% !important; border-collapse: collapse !important; }
             th, td { border: 1px solid #94a3b8 !important; padding: 6px 10px !important; font-size: 11pt !important; }
         }
@@ -156,32 +170,32 @@
             <div id="sectionKas" class="space-y-6">
                 <!-- RINGKASAN SALDO -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between summary-card">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Pemasukan Kas Umum</p>
                             <p id="totalPemasukanKasUmum" class="text-2xl font-bold text-emerald-600">Rp 0</p>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 icon-box">
                             <i class="fa-solid fa-arrow-down text-xl"></i>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between summary-card">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Pengeluaran / Belanja</p>
                             <p id="totalPengeluaranKasUmum" class="text-2xl font-bold text-rose-600">Rp 0</p>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 icon-box">
                             <i class="fa-solid fa-arrow-up text-xl"></i>
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-5 text-white shadow-md flex items-center justify-between">
+                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-5 text-white shadow-md flex items-center justify-between border border-indigo-700 summary-card">
                         <div>
                             <p class="text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-1">Saldo Kas Umum</p>
                             <p id="saldoAkhirKasUmum" class="text-2xl font-bold text-amber-300">Rp 0</p>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center text-xl border border-white/10 shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center text-xl border border-white/10 shrink-0 icon-box">
                             <i class="fa-solid fa-vault"></i>
                         </div>
                     </div>
@@ -256,32 +270,32 @@
             <div id="sectionAnggota" class="hidden space-y-6">
                 <!-- RINGKASAN SALDO SETORAN KAS ANGGOTA -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between summary-card">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Pemasukan Kas Anggota</p>
                             <p id="totalPemasukanKasAnggota" class="text-2xl font-bold text-emerald-600">Rp 0</p>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 icon-box">
                             <i class="fa-solid fa-coins text-xl"></i>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between summary-card">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Pengeluaran Kas Anggota</p>
                             <p id="totalPengeluaranKasAnggota" class="text-2xl font-bold text-rose-600">Rp 0</p>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 icon-box">
                             <i class="fa-solid fa-arrow-up text-xl"></i>
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-5 text-white shadow-md flex items-center justify-between">
+                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-5 text-white shadow-md flex items-center justify-between border border-indigo-700 summary-card">
                         <div>
                             <p class="text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-1">Sisa Saldo Kas Anggota</p>
                             <p id="saldoAkhirKasAnggota" class="text-2xl font-bold text-amber-300">Rp 0</p>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center text-xl border border-white/10 shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center text-xl border border-white/10 shrink-0 icon-box">
                             <i class="fa-solid fa-users"></i>
                         </div>
                     </div>
