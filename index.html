@@ -563,9 +563,9 @@
 
     <!-- SCRIPT LOGIC -->
     <script>
-        var DEFAULT_APPS_SCRIPT_URL = "PASANG_LINK_EXEC_KAMU_DI_SINI";
+        var DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw41jZJRnRykiFAYaLOHCd3ipXAqEKK2j_G8kML3uDxDZanwSnqnVpCoaSBuLh-CptKRg/exec";
 
-        var currentScriptUrl = localStorage.getItem('user_apps_script_url') || (DEFAULT_APPS_SCRIPT_URL !== "PASANG_LINK_EXEC_KAMU_DI_SINI" ? DEFAULT_APPS_SCRIPT_URL : "");
+        var currentScriptUrl = localStorage.getItem('user_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
         var currentUser = JSON.parse(localStorage.getItem('kas_current_user')) || null;
 
         window.kasUmumList = [];
