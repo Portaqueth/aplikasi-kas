@@ -170,9 +170,9 @@
                         <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300 text-sm">
                             <tr>
                                 <td colspan="3" class="p-3.5 text-right">RINGKASAN TOTAL:</td>
-                                <td id="footPemasukanKasUmum" class="p-3.5 text-right text-emerald-600">0</td>
-                                <td id="footPengeluaranKasUmum" class="p-3.5 text-right text-rose-600">0</td>
-                                <td id="footSaldoKasUmum" class="p-3.5 text-right text-indigo-700 bg-indigo-50/50">0</td>
+                                <td id="footPemasukanKasUmum" class="p-3.5 text-right text-emerald-600">Rp 0</td>
+                                <td id="footPengeluaranKasUmum" class="p-3.5 text-right text-rose-600">Rp 0</td>
+                                <td id="footSaldoKasUmum" class="p-3.5 text-right text-indigo-700 bg-indigo-50/50">Rp 0</td>
                                 <td class="no-print"></td>
                             </tr>
                         </tfoot>
@@ -346,15 +346,22 @@
                         <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300 text-sm">
                             <tr>
                                 <td colspan="3" class="p-3.5 text-right">TOTAL KAS ANGGOTA:</td>
-                                <td id="footPemasukanKasAnggota" class="p-3.5 text-right text-emerald-600">0</td>
-                                <td id="footPengeluaranKasAnggota" class="p-3.5 text-right text-rose-600">0</td>
-                                <td id="footSaldoKasAnggota" class="p-3.5 text-right text-indigo-700 bg-indigo-50/50">0</td>
+                                <td id="footPemasukanKasAnggota" class="p-3.5 text-right text-emerald-600">Rp 0</td>
+                                <td id="footPengeluaranKasAnggota" class="p-3.5 text-right text-rose-600">Rp 0</td>
+                                <td id="footSaldoKasAnggota" class="p-3.5 text-right text-indigo-700 bg-indigo-50/50">Rp 0</td>
                                 <td class="no-print"></td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
             </div>
+        </div>
+
+        <!-- Tombol Reset Seluruh Data (Di Bagian Paling Bawah) -->
+        <div class="mt-12 text-center no-print">
+            <button onclick="resetSemuaData()" class="text-xs text-rose-500 hover:text-rose-700 font-medium transition underline">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Reset / Kosongkan Semua Data Aplikasi
+            </button>
         </div>
     </main>
 
@@ -503,22 +510,9 @@
             "Anggota 1", "Anggota 2", "Anggota 3", "Anggota 4", "Anggota 5",
             "Anggota 6", "Anggota 7", "Anggota 8", "Anggota 9", "Anggota 10"
         ];
-        
-        var defaultKasUmum = [
-            { id: 1, tanggal: "2026-05-19", uraian: "Saldo Awal", masuk: 3100000, keluar: 0 },
-            { id: 2, tanggal: "2026-06-15", uraian: "Pembelian cake ultah Gung DW", masuk: 0, keluar: 166000 },
-            { id: 3, tanggal: "2026-06-30", uraian: "Pembelian cake ultah GITA dan pembelian bunga buat Gita", masuk: 0, keluar: 311000 },
-            { id: 4, tanggal: "2026-07-02", uraian: "pembelian alat2 kerja bakti", masuk: 0, keluar: 115000 },
-            { id: 5, tanggal: "2026-07-03", uraian: "penambahan saldo jual kertas", masuk: 510000, keluar: 0 },
-            { id: 6, tanggal: "2026-07-04", uraian: "pembelian stella matic", masuk: 0, keluar: 83000 },
-            { id: 7, tanggal: "2026-07-09", uraian: "penambahan saldo kertas 1 rim print tesis", masuk: 65000, keluar: 0 },
-            { id: 8, tanggal: "2026-07-22", uraian: "pembelian cleo 2 dus", masuk: 0, keluar: 52000 },
-            { id: 9, tanggal: "2026-08-18", uraian: "pembelian stella refill 2", masuk: 0, keluar: 75000 },
-            { id: 10, tanggal: "2026-08-24", uraian: "pembelian kue basah dan kertas nasi", masuk: 0, keluar: 88500 },
-            { id: 11, tanggal: "2026-09-29", uraian: "Pembelian amplop", masuk: 0, keluar: 25000 }
-        ];
 
-        window.kasUmumList = JSON.parse(localStorage.getItem('bukukas_kas_umum')) || defaultKasUmum;
+        // DATA KOSONG BERSIH UNTUK APLIKASI
+        window.kasUmumList = JSON.parse(localStorage.getItem('bukukas_kas_umum')) || [];
         window.setoranAnggotaList = JSON.parse(localStorage.getItem('bukukas_setoran_anggota')) || [];
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -603,32 +597,36 @@
 
             window.kasUmumList.sort(function(a, b) { return new Date(a.tanggal) - new Date(b.tanggal); });
 
-            window.kasUmumList.forEach(function(tx, idx) {
-                runningSaldo += (tx.masuk - tx.keluar);
-                totalMasuk += tx.masuk;
-                totalKeluar += tx.keluar;
+            if (window.kasUmumList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada transaksi kas umum. Klik "+ Catat Pemasukan Umum" untuk mulai mencatat.</td></tr>`;
+            } else {
+                window.kasUmumList.forEach(function(tx, idx) {
+                    runningSaldo += (tx.masuk - tx.keluar);
+                    totalMasuk += tx.masuk;
+                    totalKeluar += tx.keluar;
 
-                var parts = tx.tanggal.split('-');
-                var formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
+                    var parts = tx.tanggal.split('-');
+                    var formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
 
-                var tr = document.createElement('tr');
-                tr.className = idx % 2 === 0 ? "bg-white hover:bg-slate-50/80" : "bg-slate-50/50 hover:bg-slate-100/50";
-                
-                tr.innerHTML = `
-                    <td class="p-3.5 text-center text-slate-400 font-mono text-xs">${idx + 1}</td>
-                    <td class="p-3.5 whitespace-nowrap text-slate-700 font-medium">${formattedDate}</td>
-                    <td class="p-3.5 text-slate-800 font-medium">${tx.uraian}</td>
-                    <td class="p-3.5 text-right font-medium text-emerald-600">${tx.masuk > 0 ? formatRupiah(tx.masuk) : '-'}</td>
-                    <td class="p-3.5 text-right font-medium text-rose-600">${tx.keluar > 0 ? formatRupiah(tx.keluar) : '-'}</td>
-                    <td class="p-3.5 text-right font-bold text-slate-800 bg-slate-50/30">${formatRupiah(runningSaldo)}</td>
-                    <td class="p-3.5 text-center no-print">
-                        <button onclick="hapusKasUmum(${tx.id})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus Transaksi">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                    var tr = document.createElement('tr');
+                    tr.className = idx % 2 === 0 ? "bg-white hover:bg-slate-50/80" : "bg-slate-50/50 hover:bg-slate-100/50";
+                    
+                    tr.innerHTML = `
+                        <td class="p-3.5 text-center text-slate-400 font-mono text-xs">${idx + 1}</td>
+                        <td class="p-3.5 whitespace-nowrap text-slate-700 font-medium">${formattedDate}</td>
+                        <td class="p-3.5 text-slate-800 font-medium">${tx.uraian}</td>
+                        <td class="p-3.5 text-right font-medium text-emerald-600">${tx.masuk > 0 ? formatRupiah(tx.masuk) : '-'}</td>
+                        <td class="p-3.5 text-right font-medium text-rose-600">${tx.keluar > 0 ? formatRupiah(tx.keluar) : '-'}</td>
+                        <td class="p-3.5 text-right font-bold text-slate-800 bg-slate-50/30">${formatRupiah(runningSaldo)}</td>
+                        <td class="p-3.5 text-center no-print">
+                            <button onclick="hapusKasUmum(${tx.id})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus Transaksi">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
 
             document.getElementById('totalPemasukanKasUmum').innerText = formatRupiah(totalMasuk);
             document.getElementById('totalPengeluaranKasUmum').innerText = formatRupiah(totalKeluar);
@@ -992,6 +990,17 @@
                 window.anggotaList.splice(index, 1);
                 renderModalListAnggota();
                 renderAll();
+            }
+        }
+
+        function resetSemuaData() {
+            if (confirm("Apakah Anda yakin ingin MENGHAPUS SELURUH DATA transaksi & anggota di aplikasi ini?")) {
+                localStorage.clear();
+                window.kasUmumList = [];
+                window.setoranAnggotaList = [];
+                window.anggotaList = ["Anggota 1", "Anggota 2", "Anggota 3", "Anggota 4", "Anggota 5"];
+                renderAll();
+                alert("Seluruh data telah dibersihkan.");
             }
         }
 
