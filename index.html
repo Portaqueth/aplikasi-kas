@@ -100,14 +100,15 @@
                 </button>
             </div>
 
+            <!-- FORM SIGNUP DENGAN PLACEHOLDER DIBERSIHKAN -->
             <div id="signupForm" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pengguna Baru</label>
-                    <input type="text" id="signupNama" placeholder="Contoh: Shirley" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="signupNama" placeholder="Masukkan nama pengguna" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Keperluan / Nama Kelompok</label>
-                    <input type="text" id="signupKeperluan" placeholder="Contoh: Kas Kantor" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="signupKeperluan" placeholder="Masukkan keperluan / nama kelompok" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <button onclick="prosesSignup()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition shadow-sm flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-user-plus"></i>
@@ -205,7 +206,6 @@
                             <i class="fa-solid fa-circle-minus"></i>
                             <span>- Catat Belanja</span>
                         </button>
-                        <!-- FITUR 6: SET SALDO AWAL -->
                         <button onclick="openModalSaldoAwal('kas')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
                             <i class="fa-solid fa-coins"></i>
                             <span>+ Set Saldo Awal</span>
@@ -224,7 +224,7 @@
                     </div>
                 </div>
 
-                <!-- FITUR 1: FILTER TANGGAL & PERIODE (Kas Umum) -->
+                <!-- FILTER TANGGAL & PERIODE -->
                 <div class="bg-slate-200/60 p-3.5 rounded-2xl border border-slate-300/80 flex flex-wrap items-center justify-between gap-3 no-print">
                     <div class="flex items-center space-x-2 text-xs font-semibold text-slate-700">
                         <i class="fa-solid fa-filter text-indigo-600"></i>
@@ -366,7 +366,8 @@
                                 <button onclick="setPresetNominal(10000)" type="button" class="py-1.5 bg-slate-100 hover:bg-emerald-100 hover:text-emerald-700 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition">+10.000</button>
                                 <button onclick="setPresetNominal(20000)" type="button" class="py-1.5 bg-slate-100 hover:bg-emerald-100 hover:text-emerald-700 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition">+20.000</button>
                             </div>
-                            <input type="number" id="setorNominalInput" placeholder="Contoh: 10000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
+                            <!-- INPUT NOMINAL TERFORMAT TITIK OTOMATIS -->
+                            <input type="text" inputmode="numeric" id="setorNominalInput" oninput="formatThousandInput(this)" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
                         </div>
 
                         <button onclick="simpanSetoranAnggota()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
@@ -379,7 +380,6 @@
                                 <i class="fa-solid fa-circle-minus"></i>
                                 <span>Catat Pengeluaran Kas Anggota</span>
                             </button>
-                            <!-- FITUR 6: SET SALDO AWAL ANGGOTA -->
                             <button onclick="openModalSaldoAwal('anggota')" class="w-full py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold text-xs rounded-xl border border-amber-200 transition flex items-center justify-center space-x-1.5">
                                 <i class="fa-solid fa-coins"></i>
                                 <span>Set Saldo Awal Kas Anggota</span>
@@ -389,7 +389,7 @@
 
                     <!-- Matriks Rekap Anggota & Panel Tunggakan -->
                     <div class="lg:col-span-2 space-y-4">
-                        <!-- FITUR 2: PANEL DAFTAR TUNGGAKAN ANGGOTA -->
+                        <!-- PANEL DAFTAR TUNGGAKAN ANGGOTA -->
                         <div class="bg-amber-50/80 rounded-2xl p-4 border border-amber-200 shadow-sm space-y-3 no-print">
                             <div class="flex justify-between items-center">
                                 <h4 class="font-bold text-amber-900 text-sm flex items-center space-x-2">
@@ -478,7 +478,7 @@
         </main>
     </div>
 
-    <!-- MODAL POPUP: FITUR 6 - SET SALDO AWAL -->
+    <!-- MODAL POPUP: SET SALDO AWAL -->
     <div id="modalSaldoAwal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
@@ -505,7 +505,8 @@
 
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Nominal Saldo Awal (Rp)</label>
-                <input type="number" id="saldoAwalNominal" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
+                <!-- INPUT NOMINAL TERFORMAT TITIK OTOMATIS -->
+                <input type="text" inputmode="numeric" id="saldoAwalNominal" oninput="formatThousandInput(this)" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
             </div>
 
             <div class="pt-2 flex space-x-2">
@@ -540,7 +541,8 @@
 
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Nominal Pengeluaran (Rp)</label>
-                <input type="number" id="keluarAnggotaNominal" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
+                <!-- INPUT NOMINAL TERFORMAT TITIK OTOMATIS -->
+                <input type="text" inputmode="numeric" id="keluarAnggotaNominal" oninput="formatThousandInput(this)" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
             </div>
 
             <div class="pt-2 flex space-x-2">
@@ -605,7 +607,8 @@
 
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Nominal (Rp)</label>
-                <input type="number" id="modalTxNominal" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
+                <!-- INPUT NOMINAL TERFORMAT TITIK OTOMATIS -->
+                <input type="text" inputmode="numeric" id="modalTxNominal" oninput="formatThousandInput(this)" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800">
             </div>
 
             <div class="pt-2 flex space-x-2">
@@ -661,6 +664,21 @@
         window.kasUmumList = [];
         window.setoranAnggotaList = [];
         window.anggotaList = ["Anggota 1", "Anggota 2", "Anggota 3", "Anggota 4", "Anggota 5"];
+
+        /* FUNGI UTILS FORMATTER RIBUAN TITIK OTOMATIS */
+        function formatThousandInput(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (!val) {
+                input.value = '';
+                return;
+            }
+            input.value = new Intl.NumberFormat('id-ID').format(parseInt(val, 10));
+        }
+
+        function parseFormattedNumber(str) {
+            if (!str) return 0;
+            return parseFloat(str.toString().replace(/\./g, '')) || 0;
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             setTodayDates();
@@ -856,7 +874,6 @@
             renderTunggakanAnggota();
         }
 
-        /* FITUR 1: FILTER TANGGAL & PERIODE KAS UMUM */
         function renderTableKasUmum() {
             var tbody = document.getElementById('tabelKasUmumBody');
             if(!tbody) return;
@@ -978,7 +995,6 @@
             document.getElementById('footSaldoKasAnggota').innerText = formatRupiah(runningSaldo);
         }
 
-        /* FITUR 2: DAFTAR TUNGGAKAN ANGGOTA */
         function renderTunggakanAnggota() {
             var bulanSelected = document.getElementById('setorBulanSelect').value;
             document.getElementById('tunggakanBulanTitle').innerText = bulanSelected;
@@ -1022,7 +1038,6 @@
             document.getElementById('setorNominalInput').focus();
         }
 
-        /* FITUR 6: SET SALDO AWAL */
         function openModalSaldoAwal(tipe) {
             document.getElementById('saldoAwalTipe').value = tipe;
             var title = tipe === 'kas' ? 'Set Saldo Awal Kas Umum' : 'Set Saldo Awal Kas Anggota';
@@ -1040,7 +1055,7 @@
             var tipe = document.getElementById('saldoAwalTipe').value;
             var tanggal = document.getElementById('saldoAwalTanggal').value;
             var uraian = document.getElementById('saldoAwalUraian').value.trim();
-            var nominal = parseFloat(document.getElementById('saldoAwalNominal').value);
+            var nominal = parseFormattedNumber(document.getElementById('saldoAwalNominal').value);
 
             if (!tanggal || !uraian || isNaN(nominal) || nominal <= 0) {
                 alert("Masukkan tanggal, uraian, dan nominal saldo awal yang valid!");
@@ -1202,7 +1217,7 @@
             var jenis = document.getElementById('modalTxJenis').value;
             var tanggal = document.getElementById('modalTxTanggal').value;
             var uraian = document.getElementById('modalTxUraian').value.trim();
-            var nominal = parseFloat(document.getElementById('modalTxNominal').value);
+            var nominal = parseFormattedNumber(document.getElementById('modalTxNominal').value);
 
             if (!tanggal || !uraian || isNaN(nominal) || nominal <= 0) {
                 alert("Harap isi tanggal, uraian, dan nominal transaksi dengan benar!");
@@ -1224,14 +1239,15 @@
         }
 
         function setPresetNominal(val) {
-            document.getElementById('setorNominalInput').value = val;
+            var input = document.getElementById('setorNominalInput');
+            input.value = new Intl.NumberFormat('id-ID').format(val);
         }
 
         function simpanSetoranAnggota() {
             var nama = document.getElementById('setorAnggotaSelect').value;
             var tanggal = document.getElementById('setorTanggalInput').value;
             var bulan = document.getElementById('setorBulanSelect').value;
-            var nominal = parseFloat(document.getElementById('setorNominalInput').value);
+            var nominal = parseFormattedNumber(document.getElementById('setorNominalInput').value);
 
             if (!nama) {
                 alert("Pilih atau tambahkan anggota terlebih dahulu!");
@@ -1274,7 +1290,7 @@
         function simpanPengeluaranAnggota() {
             var tanggal = document.getElementById('keluarAnggotaTanggal').value;
             var uraian = document.getElementById('keluarAnggotaUraian').value.trim();
-            var nominal = parseFloat(document.getElementById('keluarAnggotaNominal').value);
+            var nominal = parseFormattedNumber(document.getElementById('keluarAnggotaNominal').value);
 
             if (!tanggal || !uraian || isNaN(nominal) || nominal <= 0) {
                 alert("Harap isi tanggal, uraian, dan nominal pengeluaran kas anggota dengan benar!");
