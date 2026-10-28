@@ -4,6 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Kas Digital - Multi Kas & Cloud Sync</title>
+
+    <!-- Meta Tags PWA & Theme Color -->
+    <meta name="theme-color" content="#4338ca">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kas Digital">
+
+    <!-- Ikon Aplikasi (HP & Browser) -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- Manifest PWA Otomatis -->
+    <link rel="manifest" id="manifestLink">
+    <script>
+        const manifestData = {
+            "name": "Aplikasi Kas Digital",
+            "short_name": "Kas Digital",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#4338ca",
+            "theme_color": "#4338ca",
+            "icons": [
+                {
+                    "src": "icon.png",
+                    "sizes": "192x192",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                },
+                {
+                    "src": "icon.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(manifestData);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        document.addEventListener('DOMContentLoaded', () => {
+            const mLink = document.getElementById('manifestLink');
+            if(mLink) mLink.setAttribute('href', manifestURL);
+        });
+    </script>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -94,8 +139,8 @@
     <div id="authSection" class="max-w-md mx-auto pt-12 px-4">
         <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-md border border-slate-200 dark:border-slate-700">
             <div class="text-center mb-6">
-                <div class="inline-block bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 p-4 rounded-2xl mb-2">
-                    <i class="fa-solid fa-wallet text-3xl"></i>
+                <div class="inline-block bg-indigo-100 dark:bg-indigo-950/80 p-4 rounded-2xl mb-2">
+                    <i class="fa-solid fa-wallet text-3xl text-indigo-600 dark:text-indigo-400"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Aplikasi Kas Digital</h1>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Sistem Pembukuan Kas Terintegrasi Cloud</p>
@@ -140,13 +185,25 @@
 
     <!-- PANEL DASHBOARD UTAMA -->
     <div id="dashboardSection" class="hidden">
+
+        <!-- BANNER INFORMASI MODE INTIP -->
+        <div id="readOnlyBanner" class="hidden bg-amber-400 text-slate-900 px-4 py-2 text-xs font-bold flex justify-between items-center shadow-md no-print border-b border-amber-500">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-eye text-base"></i>
+                <span>👁️ MODE INTIP AKUN (READ-ONLY) — Anda sedang mengintip pembukuan: <strong id="inspectedUserTitle" class="underline"></strong>. Seluruh fitur ubah/tambah data dimatikan.</span>
+            </div>
+            <button type="button" onclick="exitReadOnlyMode()" class="bg-slate-900 hover:bg-slate-800 text-amber-300 px-3 py-1 rounded-lg text-xs font-bold transition">
+                🚪 Keluar Mode Intip
+            </button>
+        </div>
+
         <header class="bg-indigo-700 dark:bg-slate-800 text-white shadow-lg sticky top-0 z-50 no-print transition-colors duration-200">
             <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 
                 <!-- Identitas Pengguna & Multi Buku Kas Dropdown -->
                 <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-start">
                     <div class="flex items-center space-x-3">
-                        <div class="bg-white/10 p-2.5 rounded-xl border border-white/20">
+                        <div class="bg-white/10 p-2.5 rounded-xl border border-white/20 flex items-center justify-center">
                             <i class="fa-solid fa-wallet text-2xl text-amber-300"></i>
                         </div>
                         <div>
@@ -163,10 +220,10 @@
                         <i class="fa-solid fa-book text-amber-300 text-xs"></i>
                         <select id="kasSubCategorySelect" onchange="changeKasSubCategory(this.value)" class="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer">
                         </select>
-                        <button type="button" onclick="openModalTambahBukuKas()" class="text-amber-300 hover:text-white p-1 ml-1" title="Tambah Buku Kas Baru">
+                        <button type="button" id="btnAddBukuKas" onclick="openModalTambahBukuKas()" class="text-amber-300 hover:text-white p-1 ml-1" title="Tambah Buku Kas Baru">
                             <i class="fa-solid fa-circle-plus text-sm"></i>
                         </button>
-                        <button type="button" onclick="hapusBukuKasAktif()" class="text-rose-300 hover:text-rose-100 p-1" title="Hapus Buku Kas Ini">
+                        <button type="button" id="btnDeleteBukuKas" onclick="hapusBukuKasAktif()" class="text-rose-300 hover:text-rose-100 p-1" title="Hapus Buku Kas Ini">
                             <i class="fa-solid fa-trash-can text-xs"></i>
                         </button>
                     </div>
@@ -262,15 +319,15 @@
 
                 <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 no-print">
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                        <button type="button" onclick="openModalTransaksi('masuk')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
+                        <button type="button" id="btnCatatMasuk" onclick="openModalTransaksi('masuk')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
                             <i class="fa-solid fa-circle-plus"></i>
                             <span>+ Catat Pemasukan</span>
                         </button>
-                        <button type="button" onclick="openModalTransaksi('keluar')" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
+                        <button type="button" id="btnCatatKeluar" onclick="openModalTransaksi('keluar')" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
                             <i class="fa-solid fa-circle-minus"></i>
                             <span>- Catat Belanja</span>
                         </button>
-                        <button type="button" onclick="openModalSaldoAwal('kas')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
+                        <button type="button" id="btnSaldoAwal" onclick="openModalSaldoAwal('kas')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center space-x-2">
                             <i class="fa-solid fa-coins"></i>
                             <span>+ Set Saldo Awal</span>
                         </button>
@@ -397,7 +454,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4 h-fit no-print">
+                    <div id="formInputSetoranBox" class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4 h-fit no-print">
                         <h3 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2 border-b dark:border-slate-700 pb-3">
                             <i class="fa-solid fa-hand-holding-dollar text-emerald-600 dark:text-emerald-400"></i>
                             <span>Input Setor Kas Anggota</span>
@@ -443,17 +500,17 @@
                             <input type="text" inputmode="numeric" id="setorNominalInput" oninput="formatThousandInput(this)" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-800 dark:text-slate-100">
                         </div>
 
-                        <button type="button" onclick="simpanSetoranAnggota()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
+                        <button type="button" id="btnSimpanSetor" onclick="simpanSetoranAnggota()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-paper-plane"></i>
                             <span>Simpan Setoran Kas</span>
                         </button>
 
                         <div class="pt-2 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-700">
-                            <button type="button" onclick="openModalPengeluaranAnggota()" class="w-full py-2 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-semibold text-xs rounded-xl border border-rose-200 dark:border-rose-900 transition flex items-center justify-center space-x-1.5">
+                            <button type="button" id="btnPengeluaranAnggota" onclick="openModalPengeluaranAnggota()" class="w-full py-2 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-semibold text-xs rounded-xl border border-rose-200 dark:border-rose-900 transition flex items-center justify-center space-x-1.5">
                                 <i class="fa-solid fa-circle-minus"></i>
                                 <span>Catat Pengeluaran Kas Anggota</span>
                             </button>
-                            <button type="button" onclick="openModalSaldoAwal('anggota')" class="w-full py-2 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-xl border border-amber-200 dark:border-amber-900 transition flex items-center justify-center space-x-1.5">
+                            <button type="button" id="btnSaldoAwalAnggota" onclick="openModalSaldoAwal('anggota')" class="w-full py-2 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-xl border border-amber-200 dark:border-amber-900 transition flex items-center justify-center space-x-1.5">
                                 <i class="fa-solid fa-coins"></i>
                                 <span>Set Saldo Awal Kas Anggota</span>
                             </button>
@@ -484,7 +541,7 @@
                                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Lencana centang terfilter otomatis sesuai tahun yang dipilih</p>
                                 </div>
                                 
-                                <button type="button" onclick="openModalManageAnggota()" class="text-xs bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-100 transition flex items-center space-x-1 no-print shrink-0 border border-indigo-200 dark:border-indigo-800">
+                                <button type="button" id="btnKelolaAnggota" onclick="openModalManageAnggota()" class="text-xs bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-100 transition flex items-center space-x-1 no-print shrink-0 border border-indigo-200 dark:border-indigo-800">
                                     <i class="fa-solid fa-user-gear"></i>
                                     <span>+ Kelola Anggota</span>
                                 </button>
@@ -585,7 +642,7 @@
                 </div>
 
                 <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <h4 class="font-bold text-xs uppercase text-slate-500 dark:text-slate-400 mb-2">3. Intip / Pindah Ke Akun Pengguna</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-500 dark:text-slate-400 mb-2">3. Intip Akun Pengguna (Mode Read-Only)</h4>
                     <div id="superAdminUserList" class="max-h-36 overflow-y-auto space-y-1.5 pr-1">
                         <!-- Dynamic Users List -->
                     </div>
@@ -625,7 +682,7 @@
                     <h4 class="font-bold text-xs uppercase text-slate-500 dark:text-slate-400 mb-2">2. Pulihkan Data (Restore)</h4>
                     <p class="text-xs text-slate-600 dark:text-slate-300 mb-3">Unggah file JSON cadangan untuk memulihkan seluruh data kas.</p>
                     <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="processRestoreJSON(this)">
-                    <button type="button" onclick="document.getElementById('importJsonInput').click()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition flex items-center justify-center space-x-2">
+                    <button type="button" id="btnRestoreJson" onclick="document.getElementById('importJsonInput').click()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-upload"></i>
                         <span>Pilih File JSON & Pulihkan</span>
                     </button>
@@ -812,7 +869,7 @@
                 </button>
             </div>
 
-            <div class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+            <div id="boxTambahAnggotaModal" class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Tambah Anggota Baru</label>
                 <div class="flex space-x-2">
                     <input type="text" id="inputNamaAnggotaBaru" placeholder="Masukkan nama anggota" class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-100">
@@ -840,8 +897,10 @@
 
         var currentScriptUrl = localStorage.getItem('user_apps_script_url') || DEFAULT_APPS_SCRIPT_URL;
         var currentUser = JSON.parse(localStorage.getItem('kas_current_user')) || null;
+        var realAdminUser = null;
 
-        // Data Structure Global
+        window.isReadOnlyMode = false;
+
         window.activeKasSub = "Kas Rutin";
         window.multiKasData = {
             "Kas Rutin": { kasUmum: [], setoranAnggota: [] }
@@ -849,14 +908,12 @@
         window.anggotaList = ["Anggota 1", "Anggota 2", "Anggota 3", "Anggota 4", "Anggota 5"];
         window.allUsersMasterList = [];
 
-        // Check jika user adalah Super Admin
         function isSuperAdmin() {
             if (!currentUser || !currentUser.nama) return false;
             var lowerName = currentUser.nama.toLowerCase();
             return lowerName === 'admin' || lowerName === 'superadmin';
         }
 
-        // Toast Helper
         function showToast(message, type = 'info') {
             var container = document.getElementById('toastContainer');
             if(!container) return;
@@ -876,7 +933,6 @@
             }, 3000);
         }
 
-        // Dark Mode Setup
         function initDarkMode() {
             var isDark = localStorage.getItem('kas_dark_mode') === 'true';
             if (isDark) {
@@ -942,6 +998,38 @@
             if(document.getElementById('printDate')) document.getElementById('printDate').innerText = new Date().toLocaleDateString('id-ID', options);
         }
 
+        function applyReadOnlyUI() {
+            var banner = document.getElementById('readOnlyBanner');
+            var inspectedTitle = document.getElementById('inspectedUserTitle');
+            
+            if (window.isReadOnlyMode) {
+                if(banner) banner.classList.remove('hidden');
+                if(inspectedTitle && currentUser) inspectedTitle.innerText = currentUser.nama;
+
+                if(document.getElementById('btnCatatMasuk')) document.getElementById('btnCatatMasuk').classList.add('hidden');
+                if(document.getElementById('btnCatatKeluar')) document.getElementById('btnCatatKeluar').classList.add('hidden');
+                if(document.getElementById('btnSaldoAwal')) document.getElementById('btnSaldoAwal').classList.add('hidden');
+                if(document.getElementById('btnAddBukuKas')) document.getElementById('btnAddBukuKas').classList.add('hidden');
+                if(document.getElementById('btnDeleteBukuKas')) document.getElementById('btnDeleteBukuKas').classList.add('hidden');
+
+                if(document.getElementById('formInputSetoranBox')) document.getElementById('formInputSetoranBox').classList.add('hidden');
+                if(document.getElementById('btnKelolaAnggota')) document.getElementById('btnKelolaAnggota').classList.add('hidden');
+                if(document.getElementById('btnRestoreJson')) document.getElementById('btnRestoreJson').classList.add('hidden');
+            } else {
+                if(banner) banner.classList.add('hidden');
+
+                if(document.getElementById('btnCatatMasuk')) document.getElementById('btnCatatMasuk').classList.remove('hidden');
+                if(document.getElementById('btnCatatKeluar')) document.getElementById('btnCatatKeluar').classList.remove('hidden');
+                if(document.getElementById('btnSaldoAwal')) document.getElementById('btnSaldoAwal').classList.remove('hidden');
+                if(document.getElementById('btnAddBukuKas')) document.getElementById('btnAddBukuKas').classList.remove('hidden');
+                if(document.getElementById('btnDeleteBukuKas')) document.getElementById('btnDeleteBukuKas').classList.remove('hidden');
+
+                if(document.getElementById('formInputSetoranBox')) document.getElementById('formInputSetoranBox').classList.remove('hidden');
+                if(document.getElementById('btnKelolaAnggota')) document.getElementById('btnKelolaAnggota').classList.remove('hidden');
+                if(document.getElementById('btnRestoreJson')) document.getElementById('btnRestoreJson').classList.remove('hidden');
+            }
+        }
+
         function checkState() {
             if (!currentScriptUrl) {
                 document.getElementById('configSection').classList.remove('hidden');
@@ -960,8 +1048,9 @@
                 if(document.getElementById('userKeperluanDisplay')) document.getElementById('userKeperluanDisplay').innerText = currentUser.keperluan || "Kas Kelompok";
                 if(document.getElementById('printAppName')) document.getElementById('printAppName').innerText = "Aplikasi Kas (" + currentUser.nama + ")";
 
-                // Render UI elemen khusus Super Admin
-                if (isSuperAdmin()) {
+                var isAdmin = isSuperAdmin() || (realAdminUser && (realAdminUser.nama.toLowerCase() === 'admin' || realAdminUser.nama.toLowerCase() === 'superadmin'));
+                
+                if (isAdmin) {
                     if(document.getElementById('superAdminBadge')) document.getElementById('superAdminBadge').classList.remove('hidden');
                     if(document.getElementById('btnSuperAdminMaster')) document.getElementById('btnSuperAdminMaster').classList.remove('hidden');
                 } else {
@@ -969,6 +1058,7 @@
                     if(document.getElementById('btnSuperAdminMaster')) document.getElementById('btnSuperAdminMaster').classList.add('hidden');
                 }
 
+                applyReadOnlyUI();
                 loadDataFromCloud();
             }
         }
@@ -1049,6 +1139,8 @@
             .then(data => {
                 if (data.status === 'success') {
                     currentUser = { nama: data.nama, keperluan: data.keperluan };
+                    realAdminUser = null;
+                    window.isReadOnlyMode = false;
                     localStorage.setItem('kas_current_user', JSON.stringify(currentUser));
                     checkState();
                 } else {
@@ -1061,10 +1153,13 @@
         function logout() {
             localStorage.removeItem('kas_current_user');
             currentUser = null;
+            realAdminUser = null;
+            window.isReadOnlyMode = false;
             checkState();
         }
 
         function saveDataToCloud() {
+            if (window.isReadOnlyMode) return;
             if (!currentUser) return;
             fetch(currentScriptUrl, {
                 method: 'POST',
@@ -1153,6 +1248,7 @@
         }
 
         function openModalTambahBukuKas() {
+            if (window.isReadOnlyMode) return;
             if(document.getElementById('inputNamaBukuKasBaru')) document.getElementById('inputNamaBukuKasBaru').value = '';
             document.getElementById('modalTambahBukuKas').classList.remove('hidden');
         }
@@ -1162,6 +1258,10 @@
         }
 
         function simpanBukuKasBaru() {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak bisa menambah buku kas.", "error");
+                return;
+            }
             var nameInput = document.getElementById('inputNamaBukuKasBaru');
             var nama = nameInput ? nameInput.value.trim() : '';
 
@@ -1187,6 +1287,10 @@
         }
 
         function hapusBukuKasAktif() {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak bisa menghapus buku kas.", "error");
+                return;
+            }
             var keys = Object.keys(window.multiKasData);
             if (keys.length <= 1) {
                 showToast("Tidak bisa menghapus! Minimal harus ada 1 buku kas.", "error");
@@ -1222,9 +1326,11 @@
             if (!container) return;
             container.innerHTML = '';
 
+            var adminName = realAdminUser ? realAdminUser.nama : currentUser.nama;
+
             fetch(currentScriptUrl, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'getAllUsersMasterData', nama: currentUser.nama })
+                body: JSON.stringify({ action: 'getAllUsersMasterData', nama: adminName })
             })
             .then(res => res.json())
             .then(res => {
@@ -1245,8 +1351,9 @@
                                 <span class="font-bold text-slate-800 dark:text-slate-100">${userKey}</span>
                                 <span class="text-[10px] text-slate-400 block">${uData.keperluan || 'Kas Kelompok'}</span>
                             </div>
-                            <button type="button" onclick="switchToUser('${userKey}')" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold rounded-lg hover:bg-indigo-100 transition">
-                                Intip / Pindah
+                            <button type="button" onclick="switchToUser('${userKey}', '${uData.keperluan || ''}')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition flex items-center space-x-1">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Intip (Read-Only)</span>
                             </button>
                         `;
                         container.appendChild(row);
@@ -1258,18 +1365,34 @@
             });
         }
 
-        function switchToUser(targetUserNama) {
-            currentUser = { nama: targetUserNama, keperluan: "Akun Pengguna (Mode Super Admin)" };
-            localStorage.setItem('kas_current_user', JSON.stringify(currentUser));
+        function switchToUser(targetUserNama, keperluan) {
+            if (!realAdminUser) {
+                realAdminUser = currentUser;
+            }
+            currentUser = { nama: targetUserNama, keperluan: keperluan || "Kas Kelompok" };
+            window.isReadOnlyMode = true;
+
             closeModalSuperAdmin();
             checkState();
-            showToast(`Beralih ke pembukuan akun: ${targetUserNama}`, "success");
+            showToast(`Melihat data akun ${targetUserNama} (Mode Read-Only)`, "info");
+        }
+
+        function exitReadOnlyMode() {
+            if (realAdminUser) {
+                currentUser = realAdminUser;
+                realAdminUser = null;
+            }
+            window.isReadOnlyMode = false;
+            checkState();
+            showToast("Kembali ke akun Super Admin", "success");
         }
 
         function downloadMasterBackupJSON() {
+            var adminName = realAdminUser ? realAdminUser.nama : currentUser.nama;
+
             fetch(currentScriptUrl, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'getAllUsersMasterData', nama: currentUser.nama })
+                body: JSON.stringify({ action: 'getAllUsersMasterData', nama: adminName })
             })
             .then(res => res.json())
             .then(res => {
@@ -1277,7 +1400,7 @@
                     var masterData = {
                         version: "2.0-MASTER",
                         timestamp: new Date().toISOString(),
-                        exportedBy: currentUser.nama,
+                        exportedBy: adminName,
                         allUsersData: res.allUsersData
                     };
 
@@ -1297,6 +1420,10 @@
         }
 
         function processMasterRestoreJSON(input) {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak bisa restore master data saat mengintip akun.", "error");
+                return;
+            }
             var file = input.files[0];
             if (!file) return;
 
@@ -1363,6 +1490,10 @@
         }
 
         function processRestoreJSON(input) {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Restore data dimatikan.", "error");
+                return;
+            }
             var file = input.files[0];
             if (!file) return;
 
@@ -1517,6 +1648,12 @@
                     var tr = document.createElement('tr');
                     tr.className = idx % 2 === 0 ? "bg-white dark:bg-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/50" : "bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/50 dark:hover:bg-slate-700/50";
                     
+                    var actionColumn = window.isReadOnlyMode ? '-' : `
+                        <button type="button" onclick="hapusKasUmum(${tx.id})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus Transaksi">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    `;
+
                     tr.innerHTML = `
                         <td class="p-3.5 text-center text-slate-400 font-mono text-xs">${idx + 1}</td>
                         <td class="p-3.5 whitespace-nowrap text-slate-700 dark:text-slate-300 font-medium">${formattedDate}</td>
@@ -1524,11 +1661,7 @@
                         <td class="p-3.5 text-right font-medium text-emerald-600 dark:text-emerald-400">${tx.masuk > 0 ? formatRupiah(tx.masuk) : '-'}</td>
                         <td class="p-3.5 text-right font-medium text-rose-600 dark:text-rose-400">${tx.keluar > 0 ? formatRupiah(tx.keluar) : '-'}</td>
                         <td class="p-3.5 text-right font-bold text-slate-800 dark:text-slate-100 bg-slate-50/30 dark:bg-slate-900/30">${formatRupiah(runningSaldo)}</td>
-                        <td class="p-3.5 text-center no-print">
-                            <button type="button" onclick="hapusKasUmum(${tx.id})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus Transaksi">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </td>
+                        <td class="p-3.5 text-center no-print">${actionColumn}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1589,6 +1722,12 @@
                     var tr = document.createElement('tr');
                     tr.className = idx % 2 === 0 ? "bg-white dark:bg-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/50" : "bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/50 dark:hover:bg-slate-700/50";
 
+                    var actionColumn = window.isReadOnlyMode ? '-' : `
+                        <button type="button" onclick="hapusSetoranAnggota(${item.id})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus Transaksi">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    `;
+
                     tr.innerHTML = `
                         <td class="p-3.5 text-center text-slate-400 font-mono text-xs">${idx + 1}</td>
                         <td class="p-3.5 whitespace-nowrap text-slate-700 dark:text-slate-300 font-medium">${formattedDate}</td>
@@ -1596,11 +1735,7 @@
                         <td class="p-3.5 text-right font-medium text-emerald-600 dark:text-emerald-400">${masuk > 0 ? formatRupiah(masuk) : '-'}</td>
                         <td class="p-3.5 text-right font-medium text-rose-600 dark:text-rose-400">${keluar > 0 ? formatRupiah(keluar) : '-'}</td>
                         <td class="p-3.5 text-right font-bold text-slate-800 dark:text-slate-100 bg-slate-50/30 dark:bg-slate-900/30">${formatRupiah(runningSaldo)}</td>
-                        <td class="p-3.5 text-center no-print">
-                            <button type="button" onclick="hapusSetoranAnggota(${item.id})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Hapus Transaksi">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </td>
+                        <td class="p-3.5 text-center no-print">${actionColumn}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1651,11 +1786,16 @@
                 belumBayar.forEach(nama => {
                     var badge = document.createElement('div');
                     badge.className = "bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700/60 px-3 py-1 rounded-xl shadow-xs flex items-center space-x-2";
-                    badge.innerHTML = `
-                        <span class="font-semibold text-slate-800 dark:text-slate-200">${nama}</span>
+                    
+                    var btnSetor = window.isReadOnlyMode ? '' : `
                         <button type="button" onclick="pilihPenyetorTunggakan('${nama}')" class="text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-0.5 rounded-lg transition" title="Setor untuk ${nama}">
                             + Setor
                         </button>
+                    `;
+
+                    badge.innerHTML = `
+                        <span class="font-semibold text-slate-800 dark:text-slate-200">${nama}</span>
+                        ${btnSetor}
                     `;
                     container.appendChild(badge);
                 });
@@ -1663,11 +1803,13 @@
         }
 
         function pilihPenyetorTunggakan(nama) {
+            if (window.isReadOnlyMode) return;
             if(document.getElementById('setorAnggotaSelect')) document.getElementById('setorAnggotaSelect').value = nama;
             if(document.getElementById('setorNominalInput')) document.getElementById('setorNominalInput').focus();
         }
 
         function openModalSaldoAwal(tipe) {
+            if (window.isReadOnlyMode) return;
             document.getElementById('saldoAwalTipe').value = tipe;
             var title = tipe === 'kas' ? 'Set Saldo Awal Kas Umum' : 'Set Saldo Awal Kas Anggota';
             document.getElementById('modalSaldoTitle').innerText = title;
@@ -1681,6 +1823,10 @@
         }
 
         function simpanSaldoAwal() {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak dapat menyimpan data.", "error");
+                return;
+            }
             var tipe = document.getElementById('saldoAwalTipe').value;
             var tanggal = document.getElementById('saldoAwalTanggal').value;
             var uraian = document.getElementById('saldoAwalUraian').value.trim();
@@ -1847,6 +1993,7 @@
         }
 
         function openModalTransaksi(jenis) {
+            if (window.isReadOnlyMode) return;
             document.getElementById('modalTxJenis').value = jenis;
             var title = jenis === 'masuk' ? 'Catat Pemasukan Kas Umum' : 'Catat Pengeluaran / Belanja Kas Umum';
             document.getElementById('modalTxTitle').innerText = title;
@@ -1860,6 +2007,10 @@
         }
 
         function simpanTransaksiUmum() {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak dapat menambah transaksi.", "error");
+                return;
+            }
             var jenis = document.getElementById('modalTxJenis').value;
             var tanggal = document.getElementById('modalTxTanggal').value;
             var uraian = document.getElementById('modalTxUraian').value.trim();
@@ -1886,11 +2037,16 @@
         }
 
         function setPresetNominal(val) {
+            if (window.isReadOnlyMode) return;
             var input = document.getElementById('setorNominalInput');
             if(input) input.value = new Intl.NumberFormat('id-ID').format(val);
         }
 
         function simpanSetoranAnggota() {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak dapat menyimpan setoran.", "error");
+                return;
+            }
             var nama = document.getElementById('setorAnggotaSelect').value;
             var tanggal = document.getElementById('setorTanggalInput').value;
             var bulan = document.getElementById('setorBulanSelect').value;
@@ -1926,6 +2082,7 @@
         }
 
         function openModalPengeluaranAnggota() {
+            if (window.isReadOnlyMode) return;
             document.getElementById('keluarAnggotaUraian').value = '';
             document.getElementById('keluarAnggotaNominal').value = '';
             document.getElementById('modalPengeluaranAnggota').classList.remove('hidden');
@@ -1936,6 +2093,10 @@
         }
 
         function simpanPengeluaranAnggota() {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak dapat menyimpan pengeluaran.", "error");
+                return;
+            }
             var tanggal = document.getElementById('keluarAnggotaTanggal').value;
             var uraian = document.getElementById('keluarAnggotaUraian').value.trim();
             var nominal = parseFormattedNumber(document.getElementById('keluarAnggotaNominal').value);
@@ -1964,6 +2125,10 @@
         }
 
         function hapusKasUmum(id) {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak bisa menghapus transaksi.", "error");
+                return;
+            }
             if (confirm("Apakah Anda yakin ingin menghapus transaksi kas umum ini?")) {
                 var active = getKasUmumActive();
                 window.multiKasData[window.activeKasSub].kasUmum = active.filter(t => t.id !== id);
@@ -1974,6 +2139,10 @@
         }
 
         function hapusSetoranAnggota(id) {
+            if (window.isReadOnlyMode) {
+                showToast("Mode Read-Only! Tidak bisa menghapus transaksi.", "error");
+                return;
+            }
             if (confirm("Apakah Anda yakin ingin menghapus transaksi kas anggota ini?")) {
                 var active = getSetoranAnggotaActive();
                 window.multiKasData[window.activeKasSub].setoranAnggota = active.filter(s => s.id !== id);
@@ -1987,6 +2156,13 @@
         function openModalManageAnggota() {
             renderModalListAnggota();
             if(document.getElementById('inputNamaAnggotaBaru')) document.getElementById('inputNamaAnggotaBaru').value = '';
+            
+            if (window.isReadOnlyMode) {
+                if(document.getElementById('boxTambahAnggotaModal')) document.getElementById('boxTambahAnggotaModal').classList.add('hidden');
+            } else {
+                if(document.getElementById('boxTambahAnggotaModal')) document.getElementById('boxTambahAnggotaModal').classList.remove('hidden');
+            }
+
             document.getElementById('modalManageAnggota').classList.remove('hidden');
         }
 
@@ -2007,8 +2183,8 @@
             window.anggotaList.forEach((nama, idx) => {
                 var row = document.createElement('div');
                 row.className = "flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm";
-                row.innerHTML = `
-                    <span class="font-medium text-slate-700 dark:text-slate-300">${idx + 1}. ${nama}</span>
+                
+                var actions = window.isReadOnlyMode ? '-' : `
                     <div class="flex items-center space-x-1">
                         <button type="button" onclick="editSatuAnggota(${idx})" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 p-1.5 transition" title="Edit Nama">
                             <i class="fa-solid fa-pen-to-square"></i>
@@ -2018,11 +2194,17 @@
                         </button>
                     </div>
                 `;
+
+                row.innerHTML = `
+                    <span class="font-medium text-slate-700 dark:text-slate-300">${idx + 1}. ${nama}</span>
+                    ${actions}
+                `;
                 container.appendChild(row);
             });
         }
 
         function editSatuAnggota(index) {
+            if (window.isReadOnlyMode) return;
             var namaLama = window.anggotaList[index];
             var namaBaru = prompt("Edit nama anggota:", namaLama);
             if (namaBaru === null) return;
@@ -2038,7 +2220,6 @@
             
             window.anggotaList[index] = namaBaru;
 
-            // Update nama di seluruh buku kas
             Object.keys(window.multiKasData).forEach(sub => {
                 if (window.multiKasData[sub].setoranAnggota) {
                     window.multiKasData[sub].setoranAnggota.forEach(item => {
@@ -2059,6 +2240,7 @@
         }
 
         function simpanSatuAnggotaBaru() {
+            if (window.isReadOnlyMode) return;
             var input = document.getElementById('inputNamaAnggotaBaru');
             var nama = input ? input.value.trim() : "";
 
@@ -2081,6 +2263,7 @@
         }
 
         function hapusSatuAnggota(index) {
+            if (window.isReadOnlyMode) return;
             if (confirm(`Hapus ${window.anggotaList[index]} dari daftar anggota?`)) {
                 window.anggotaList.splice(index, 1);
                 renderModalListAnggota();
